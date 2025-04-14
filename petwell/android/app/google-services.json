@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "535250592910",
+    "project_id": "petwell-g44",
+    "storage_bucket": "petwell-g44.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:535250592910:android:aa813e71593142772515df",
+        "android_client_info": {
+          "package_name": "com.example.petwell"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDt2cnqLMnjrxEAV33j3mPwE1eLqTopydU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
