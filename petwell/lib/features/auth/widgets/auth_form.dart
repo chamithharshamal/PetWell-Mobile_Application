@@ -1,12 +1,17 @@
-// lib/widgets/auth_form.dart
+// lib/features/auth/presentation/widgets/auth_form.dart
 import 'package:flutter/material.dart';
 
 class AuthForm extends StatefulWidget {
   final bool isSignIn;
+  final bool isLoading;
   final Function(String email, String password) onSubmit;
 
-  const AuthForm({Key? key, required this.isSignIn, required this.onSubmit})
-    : super(key: key);
+  const AuthForm({
+    Key? key,
+    required this.isSignIn,
+    this.isLoading = false,
+    required this.onSubmit,
+  }) : super(key: key);
 
   @override
   _AuthFormState createState() => _AuthFormState();
@@ -18,7 +23,6 @@ class _AuthFormState extends State<AuthForm> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   bool _isPasswordVisible = false;
-  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -30,16 +34,7 @@ class _AuthFormState extends State<AuthForm> {
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-
-      // Submit form data
       widget.onSubmit(_emailController.text.trim(), _passwordController.text);
-
-      setState(() {
-        _isLoading = false;
-      });
     }
   }
 
@@ -54,9 +49,25 @@ class _AuthFormState extends State<AuthForm> {
           TextFormField(
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
+            enabled: !widget.isLoading,
+            decoration: InputDecoration(
               labelText: 'Email',
-              prefixIcon: Icon(Icons.email_outlined),
+              labelStyle: const TextStyle(
+                color: Colors.black,
+              ), // Label text color
+              prefixIcon: const Icon(
+                Icons.email_outlined,
+                color: Colors.black,
+              ), // Optional: icon color
+              enabledBorder: const OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.black), // Normal border
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.black,
+                  width: 2,
+                ), // Focused border
+              ),
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -76,32 +87,54 @@ class _AuthFormState extends State<AuthForm> {
           TextFormField(
             controller: _passwordController,
             obscureText: !_isPasswordVisible,
+            enabled: !widget.isLoading,
             decoration: InputDecoration(
               labelText: 'Password',
-              prefixIcon: const Icon(Icons.lock_outline),
+              labelStyle: const TextStyle(
+                color: Colors.black,
+              ), // Label text color
+              prefixIcon: const Icon(
+                Icons.lock_outline,
+                color: Colors.black,
+              ), // Icon color
+              enabledBorder: const OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.black), // Normal border
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.black,
+                  width: 2,
+                ), // Focused border
+              ),
+              border: const OutlineInputBorder(), // Fallback border
               suffixIcon: IconButton(
                 icon: Icon(
                   _isPasswordVisible
                       ? Icons.visibility_outlined
                       : Icons.visibility_off_outlined,
+                  color: Colors.black, // Suffix icon color
                 ),
-                onPressed: () {
-                  setState(() {
-                    _isPasswordVisible = !_isPasswordVisible;
-                  });
-                },
+                onPressed:
+                    widget.isLoading
+                        ? null
+                        : () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
               ),
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter your password';
               }
-              if (value.length < 6) {
+              if (!widget.isSignIn && value.length < 6) {
                 return 'Password must be at least 6 characters long';
               }
               return null;
             },
           ),
+
           const SizedBox(height: 16),
 
           // Confirm password field (only for sign up)
@@ -109,9 +142,23 @@ class _AuthFormState extends State<AuthForm> {
             TextFormField(
               controller: _confirmPasswordController,
               obscureText: !_isPasswordVisible,
+              enabled: !widget.isLoading,
               decoration: const InputDecoration(
                 labelText: 'Confirm Password',
-                prefixIcon: Icon(Icons.lock_outline),
+                labelStyle: TextStyle(color: Colors.black), // Label text color
+                prefixIcon: Icon(
+                  Icons.lock_outline,
+                  color: Colors.black,
+                ), // Optional: icon color
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black), // Normal border
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.black,
+                    width: 2,
+                  ), // Focused border
+                ),
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -123,6 +170,7 @@ class _AuthFormState extends State<AuthForm> {
                 return null;
               },
             ),
+
             const SizedBox(height: 16),
           ],
 
@@ -131,11 +179,19 @@ class _AuthFormState extends State<AuthForm> {
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
-                onPressed: () {
-                  // TODO: Implement forgot password logic
-                  print('Forgot password');
-                },
-                child: const Text('Forgot Password?'),
+                onPressed:
+                    widget.isLoading
+                        ? null
+                        : () {
+                          // TODO: Navigate to password reset screen
+                          print('Navigate to password reset');
+                        },
+                child: const Text(
+                  'Forgot Password?',
+                  style: TextStyle(
+                    color: Color(0xFFE74D3D),
+                  ), // Custom text color
+                ),
               ),
             ),
 
@@ -143,18 +199,32 @@ class _AuthFormState extends State<AuthForm> {
 
           // Submit button
           ElevatedButton(
-            onPressed: _isLoading ? null : _submit,
+            onPressed: widget.isLoading ? null : _submit,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(
+                0xFFE74D3D,
+              ), // Button background color
+              padding: const EdgeInsets.symmetric(vertical: 15),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
             child:
-                _isLoading
+                widget.isLoading
                     ? const SizedBox(
                       height: 20,
                       width: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: Colors.white,
+                        color: Color(0xFFE74D3D),
                       ),
                     )
-                    : Text(widget.isSignIn ? 'Sign In' : 'Sign Up'),
+                    : const Text(
+                      'Sign In', // or 'Sign Up' based on your logic
+                      style: TextStyle(
+                        color: Colors.white,
+                      ), // Optional: text color
+                    ),
           ),
 
           const SizedBox(height: 24),
@@ -183,26 +253,35 @@ class _AuthFormState extends State<AuthForm> {
               _buildSocialButton(
                 icon: Icons.g_mobiledata,
                 color: Colors.red,
-                onPressed: () {
-                  // TODO: Implement Google sign in
-                  print('Google sign in');
-                },
+                onPressed:
+                    widget.isLoading
+                        ? null
+                        : () {
+                          // TODO: Implement Google sign in with Firebase
+                          print('Google sign in');
+                        },
               ),
               _buildSocialButton(
                 icon: Icons.facebook,
                 color: Colors.blue,
-                onPressed: () {
-                  // TODO: Implement Facebook sign in
-                  print('Facebook sign in');
-                },
+                onPressed:
+                    widget.isLoading
+                        ? null
+                        : () {
+                          // TODO: Implement Facebook sign in with Firebase
+                          print('Facebook sign in');
+                        },
               ),
               _buildSocialButton(
                 icon: Icons.apple,
                 color: Colors.black,
-                onPressed: () {
-                  // TODO: Implement Apple sign in
-                  print('Apple sign in');
-                },
+                onPressed:
+                    widget.isLoading
+                        ? null
+                        : () {
+                          // TODO: Implement Apple sign in with Firebase
+                          print('Apple sign in');
+                        },
               ),
             ],
           ),
@@ -214,17 +293,13 @@ class _AuthFormState extends State<AuthForm> {
   Widget _buildSocialButton({
     required IconData icon,
     required Color color,
-    required VoidCallback onPressed,
+    required VoidCallback? onPressed,
   }) {
     return InkWell(
       onTap: onPressed,
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey[300]!),
-          borderRadius: BorderRadius.circular(16),
-        ),
         child: Icon(icon, color: color, size: 32),
       ),
     );
