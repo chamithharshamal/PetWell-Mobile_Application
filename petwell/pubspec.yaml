@@ -41,10 +41,15 @@ dependencies:
   path_provider: ^2.0.0
   uuid: ^4.3.1
   intl: ^0.20.2
-  js: ^0.7.1
+  js: ^0.6.7
   cupertino_icons: ^1.0.8
   cross_file: ^0.3.3
   google_sign_in: ^6.2.1
+  flutter_facebook_auth: ^6.0.4
+  sign_in_with_apple: ^4.2.1
+  fl_chart: ^1.0.0
+  table_calendar: ^3.0.9
+  carousel_slider: ^5.0.0
   
 
 dev_dependencies:
