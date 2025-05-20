@@ -1,5 +1,10 @@
-// lib/features/auth/presentation/widgets/auth_form.dart
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart'; 
+import 'package:sign_in_with_apple/sign_in_with_apple.dart'; 
+import '../screens/start_page.dart';
+import '../../home/home_screen.dart';
 
 class AuthForm extends StatefulWidget {
   final bool isSignIn;
@@ -7,11 +12,11 @@ class AuthForm extends StatefulWidget {
   final Function(String email, String password) onSubmit;
 
   const AuthForm({
-    Key? key,
+    super.key,
     required this.isSignIn,
     this.isLoading = false,
     required this.onSubmit,
-  }) : super(key: key);
+  });
 
   @override
   _AuthFormState createState() => _AuthFormState();
@@ -38,6 +43,65 @@ class _AuthFormState extends State<AuthForm> {
     }
   }
 
+  // Facebook Sign-in
+  Future<void> _signInWithFacebook() async {
+    try {
+      final LoginResult result = await FacebookAuth.instance.login(
+          permissions: [
+            'public_profile',
+            'email'
+          ]); // Request email as well <sup data-citation="1" className="inline select-none [&>a]:rounded-2xl [&>a]:border [&>a]:px-1.5 [&>a]:py-0.5 [&>a]:transition-colors shadow [&>a]:bg-ds-bg-subtle [&>a]:text-xs [&>svg]:w-4 [&>svg]:h-4 relative -top-[2px] citation-shimmer"><a href="#" title="Reference 1 (source not available)">1</a></sup>
+      if (result.status == LoginStatus.success) {
+        final OAuthCredential credential =
+            FacebookAuthProvider.credential(result.accessToken!.token);
+        await FirebaseAuth.instance.signInWithCredential(credential);
+        _navigateToHomeScreen();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Facebook sign-in failed: ${result.message}')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Facebook sign-in failed: $e')),
+      );
+    }
+  }
+
+  // Apple Sign-in
+  Future<void> _signInWithApple() async {
+    try {
+      final AuthorizationCredentialAppleID appleCredential =
+          await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      final OAuthCredential credential = OAuthProvider('apple.com').credential(
+        idToken: appleCredential.identityToken,
+        accessToken: appleCredential.authorizationCode,
+      );
+
+      await FirebaseAuth.instance.signInWithCredential(credential);
+      _navigateToHomeScreen();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Apple sign-in failed: $e')),
+      );
+    }
+  }
+
+  void _navigateToHomeScreen() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const HomeScreen(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -52,21 +116,13 @@ class _AuthFormState extends State<AuthForm> {
             enabled: !widget.isLoading,
             decoration: InputDecoration(
               labelText: 'Email',
-              labelStyle: const TextStyle(
-                color: Colors.black,
-              ), // Label text color
-              prefixIcon: const Icon(
-                Icons.email_outlined,
-                color: Colors.black,
-              ), // Optional: icon color
+              labelStyle: const TextStyle(color: Colors.black),
+              prefixIcon: const Icon(Icons.email_outlined, color: Colors.black),
               enabledBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.black), // Normal border
+                borderSide: BorderSide(color: Colors.black),
               ),
               focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Colors.black,
-                  width: 2,
-                ), // Focused border
+                borderSide: BorderSide(color: Colors.black, width: 2),
               ),
             ),
             validator: (value) {
@@ -90,38 +146,28 @@ class _AuthFormState extends State<AuthForm> {
             enabled: !widget.isLoading,
             decoration: InputDecoration(
               labelText: 'Password',
-              labelStyle: const TextStyle(
-                color: Colors.black,
-              ), // Label text color
-              prefixIcon: const Icon(
-                Icons.lock_outline,
-                color: Colors.black,
-              ), // Icon color
+              labelStyle: const TextStyle(color: Colors.black),
+              prefixIcon: const Icon(Icons.lock_outline, color: Colors.black),
               enabledBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.black), // Normal border
+                borderSide: BorderSide(color: Colors.black),
               ),
               focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Colors.black,
-                  width: 2,
-                ), // Focused border
+                borderSide: BorderSide(color: Colors.black, width: 2),
               ),
-              border: const OutlineInputBorder(), // Fallback border
               suffixIcon: IconButton(
                 icon: Icon(
                   _isPasswordVisible
                       ? Icons.visibility_outlined
                       : Icons.visibility_off_outlined,
-                  color: Colors.black, // Suffix icon color
+                  color: Colors.black,
                 ),
-                onPressed:
-                    widget.isLoading
-                        ? null
-                        : () {
-                          setState(() {
-                            _isPasswordVisible = !_isPasswordVisible;
-                          });
-                        },
+                onPressed: widget.isLoading
+                    ? null
+                    : () {
+                        setState(() {
+                          _isPasswordVisible = !_isPasswordVisible;
+                        });
+                      },
               ),
             ),
             validator: (value) {
@@ -145,19 +191,13 @@ class _AuthFormState extends State<AuthForm> {
               enabled: !widget.isLoading,
               decoration: const InputDecoration(
                 labelText: 'Confirm Password',
-                labelStyle: TextStyle(color: Colors.black), // Label text color
-                prefixIcon: Icon(
-                  Icons.lock_outline,
-                  color: Colors.black,
-                ), // Optional: icon color
+                labelStyle: TextStyle(color: Colors.black),
+                prefixIcon: Icon(Icons.lock_outline, color: Colors.black),
                 enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black), // Normal border
+                  borderSide: BorderSide(color: Colors.black),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Colors.black,
-                    width: 2,
-                  ), // Focused border
+                  borderSide: BorderSide(color: Colors.black, width: 2),
                 ),
               ),
               validator: (value) {
@@ -170,7 +210,6 @@ class _AuthFormState extends State<AuthForm> {
                 return null;
               },
             ),
-
             const SizedBox(height: 16),
           ],
 
@@ -179,18 +218,40 @@ class _AuthFormState extends State<AuthForm> {
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
-                onPressed:
-                    widget.isLoading
-                        ? null
-                        : () {
-                          // TODO: Navigate to password reset screen
-                          print('Navigate to password reset');
-                        },
+                onPressed: widget.isLoading
+                    ? null
+                    : () async {
+                        if (_emailController.text.isNotEmpty) {
+                          try {
+                            await FirebaseAuth.instance
+                                .sendPasswordResetEmail(
+                                  email: _emailController.text.trim(),
+                                );
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Password reset email sent'),
+                              ),
+                            );
+                          } on FirebaseAuthException catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  e.message ?? 'Failed to send reset email',
+                                ),
+                              ),
+                            );
+                          }
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please enter your email'),
+                            ),
+                          );
+                        }
+                      },
                 child: const Text(
                   'Forgot Password?',
-                  style: TextStyle(
-                    color: Color(0xFFE74D3D),
-                  ), // Custom text color
+                  style: TextStyle(color: Color(0xFFE74D3D)),
                 ),
               ),
             ),
@@ -201,30 +262,25 @@ class _AuthFormState extends State<AuthForm> {
           ElevatedButton(
             onPressed: widget.isLoading ? null : _submit,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(
-                0xFFE74D3D,
-              ), // Button background color
+              backgroundColor: const Color(0xFFE74D3D),
               padding: const EdgeInsets.symmetric(vertical: 15),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child:
-                widget.isLoading
-                    ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Color(0xFFE74D3D),
-                      ),
-                    )
-                    : const Text(
-                      'Sign In', // or 'Sign Up' based on your logic
-                      style: TextStyle(
-                        color: Colors.white,
-                      ), // Optional: text color
+            child: widget.isLoading
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
                     ),
+                  )
+                : Text(
+                    widget.isSignIn ? 'Sign In' : 'Sign Up',
+                    style: const TextStyle(color: Colors.white),
+                  ),
           ),
 
           const SizedBox(height: 24),
@@ -253,35 +309,43 @@ class _AuthFormState extends State<AuthForm> {
               _buildSocialButton(
                 icon: Icons.g_mobiledata,
                 color: Colors.red,
-                onPressed:
-                    widget.isLoading
-                        ? null
-                        : () {
-                          // TODO: Implement Google sign in with Firebase
-                          print('Google sign in');
-                        },
+                onPressed: widget.isLoading
+                    ? null
+                    : () async {
+                        try {
+                          final GoogleSignIn googleSignIn = GoogleSignIn();
+                          final GoogleSignInAccount? googleUser =
+                              await googleSignIn.signIn();
+                          if (googleUser == null) return; // User canceled
+
+                          final GoogleSignInAuthentication googleAuth =
+                              await googleUser.authentication;
+                          final credential = GoogleAuthProvider.credential(
+                            accessToken: googleAuth.accessToken,
+                            idToken: googleAuth.idToken,
+                          );
+
+                          await FirebaseAuth.instance
+                              .signInWithCredential(credential);
+                          _navigateToHomeScreen();
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Google sign-in failed: $e'),
+                            ),
+                          );
+                        }
+                      },
               ),
               _buildSocialButton(
                 icon: Icons.facebook,
                 color: Colors.blue,
-                onPressed:
-                    widget.isLoading
-                        ? null
-                        : () {
-                          // TODO: Implement Facebook sign in with Firebase
-                          print('Facebook sign in');
-                        },
+                onPressed: widget.isLoading ? null : _signInWithFacebook,
               ),
               _buildSocialButton(
                 icon: Icons.apple,
                 color: Colors.black,
-                onPressed:
-                    widget.isLoading
-                        ? null
-                        : () {
-                          // TODO: Implement Apple sign in with Firebase
-                          print('Apple sign in');
-                        },
+                onPressed: widget.isLoading ? null : _signInWithApple,
               ),
             ],
           ),
