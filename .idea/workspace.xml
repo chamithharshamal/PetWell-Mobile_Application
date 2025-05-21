@@ -4,13 +4,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4522690b-983d-47ad-843a-96c637a7f7fa" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/petwell/lib/features/reminders/models/reminder_model.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/petwell/lib/features/reminders/screens/reminders/add_reminder_form.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/petwell/lib/features/reminders/screens/reminders/reminder_list_screen.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/petwell/lib/features/reminders/widgets/reminder_card.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/petwell/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/petwell/lib/main.dart" afterDir="false" />
-    </list>
+    <list default="true" id="4522690b-983d-47ad-843a-96c637a7f7fa" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -20,23 +14,41 @@
     <option name="formatViaClangd" value="false" />
   </component>
   <component name="Git.Settings">
+    <favorite-branches>
+      <branch-storage>
+        <map>
+          <entry type="LOCAL">
+            <value>
+              <list>
+                <branch-info repo="$PROJECT_DIR$" source="reminders-nithma" />
+              </list>
+            </value>
+          </entry>
+        </map>
+      </branch-storage>
+    </favorite-branches>
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="reminders-nithma" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "nithmafernando"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;nithmafernando&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/chamithharshamal/PetWell-Mobile_Application.git",
-    "accountId": "9c2a4eaf-010b-4a86-a183-c1cd502529df"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/chamithharshamal/PetWell-Mobile_Application.git&quot;,
+    &quot;accountId&quot;: &quot;9c2a4eaf-010b-4a86-a183-c1cd502529df&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 4
-}]]></component>
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
   <component name="ProjectId" id="2wr0cHSPw2jtEMVeAHbfWyNMa6m" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -50,6 +62,7 @@
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
     "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "#1 on reminders-nithma",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/Users/yasith/Documents/GitHub/PetWell-Mobile_Application",
     "show.migrate.to.gradle.popup": "false"
