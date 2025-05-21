@@ -113,6 +113,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.7"
+
+
   facebook_auth_desktop:
     dependency: transitive
     description:
@@ -121,6 +123,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.3"
+
   fake_async:
     dependency: transitive
     description:
@@ -249,6 +252,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.10.12"
+
+
   fixnum:
     dependency: transitive
     description:
@@ -257,14 +262,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
+
   fl_chart:
     dependency: "direct main"
     description:
       name: fl_chart
+
+      sha256: "5a74434cc83bf64346efb562f1a06eefaf1bcb530dc3d96a104f631a1eff8d79"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.65.0"
+
       sha256: "577aeac8ca414c25333334d7c4bb246775234c0e44b38b10a82b559dd4d764e7"
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
+
   flutter:
     dependency: "direct main"
     description: flutter
@@ -368,6 +381,16 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+
+  font_awesome_flutter:
+    dependency: "direct main"
+    description:
+      name: font_awesome_flutter
+      sha256: d3a89184101baec7f4600d58840a764d2ef760fe1c5a20ef9e6b0e9b24a07a3a
+      url: "https://pub.dev"
+    source: hosted
+    version: "10.8.0"
+
   google_identity_services_web:
     dependency: transitive
     description:
@@ -416,6 +439,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.12.4+4"
+
   http:
     dependency: transitive
     description:
