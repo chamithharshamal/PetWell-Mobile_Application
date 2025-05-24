@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../widgets/auth_form.dart';
 import '../../home/home_screen.dart';
-import 'start_page.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});

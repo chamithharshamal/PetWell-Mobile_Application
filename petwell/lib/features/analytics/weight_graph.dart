@@ -1,6 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'analytics/models/weight_record.dart';
+import './models/weight_record.dart';
 
 class WeightGraph extends StatelessWidget {
   final List<WeightRecord> weightRecords;

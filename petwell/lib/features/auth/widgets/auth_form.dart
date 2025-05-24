@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart'; 
 import 'package:sign_in_with_apple/sign_in_with_apple.dart'; 
-import '../screens/start_page.dart';
 import '../../home/home_screen.dart';
 
 class AuthForm extends StatefulWidget {

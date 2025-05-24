@@ -125,7 +125,7 @@ class _PetDetailsScreenState extends State<PetDetailsScreen> {
                 Stack(
                   children: [
                     // Pet image covering top part
-                    Container(
+                    SizedBox(
                       height: 220,
                       width: double.infinity,
                       child: (pet.imageUrl != null && pet.imageUrl!.isNotEmpty)
@@ -576,11 +576,11 @@ class _PetDetailsScreenState extends State<PetDetailsScreen> {
               _addWeightRecord();
               Navigator.pop(context);
             },
-            child: const Text('Add'),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFe74d3d),
               foregroundColor: Colors.white,
             ),
+            child: const Text('Add'),
           ),
         ],
       ),

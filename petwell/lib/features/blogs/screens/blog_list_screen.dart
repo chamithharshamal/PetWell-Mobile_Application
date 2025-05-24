@@ -43,7 +43,7 @@ class BlogListScreen extends StatelessWidget {
 
               final title = blogData['title'] as String? ?? 'Untitled';
               final content = blogData['content']?.toString() ?? '';
-              final excerpt = content.length > 100 ? content.substring(0, 100) + '...' : content;
+              final excerpt = content.length > 100 ? '${content.substring(0, 100)}...' : content;
               final imageBase64 = blogData['imageBase64'] as String?;
               final authorName = blogData['authorName'] as String? ?? 'Unknown Author';
               final createdAt = (blogData['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now();

@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../pets_profile/models/pet_model.dart';
-import '../pets_profile/screens/pet_details_screen.dart';
-import '../pets_profile/screens/add_pet_dialog.dart';
+import '../pet_profile/models/pet_model.dart';
+import '../pet_profile/screens/pet_details_screen.dart';
+import '../pet_profile/screens/add_pet_dialog.dart';
 
 // String extension to add capitalize method
 extension StringCasingExtension on String {

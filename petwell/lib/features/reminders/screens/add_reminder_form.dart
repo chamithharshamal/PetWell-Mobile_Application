@@ -12,12 +12,12 @@ class AddReminderForm extends StatefulWidget {
   _AddReminderFormState createState() => _AddReminderFormState();
 
   static void showAddReminderDialog(BuildContext context, String petId) {
-    final TextEditingController _typeController = TextEditingController();
-    final TextEditingController _detailsController = TextEditingController();
-    final TextEditingController _dateController = TextEditingController();
-    final TextEditingController _timeController = TextEditingController();
+    final TextEditingController typeController = TextEditingController();
+    final TextEditingController detailsController = TextEditingController();
+    final TextEditingController dateController = TextEditingController();
+    final TextEditingController timeController = TextEditingController();
 
-    Future<void> _selectDate(BuildContext context) async {
+    Future<void> selectDate(BuildContext context) async {
       final DateTime? picked = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
@@ -32,21 +32,21 @@ class AddReminderForm extends StatefulWidget {
         );
 
         if (pickedTime != null) {
-          _dateController.text = picked.toString().substring(0, 10);
-          _timeController.text =
+          dateController.text = picked.toString().substring(0, 10);
+          timeController.text =
           '${pickedTime.hour.toString().padLeft(2, '0')}:${pickedTime.minute.toString().padLeft(2, '0')}';
           return;
         }
 
-        _dateController.text = picked.toString().substring(0, 10);
-        _timeController.text = '';
+        dateController.text = picked.toString().substring(0, 10);
+        timeController.text = '';
       }
     }
 
-    Future<void> _addRecord(BuildContext context) async {
-      if (_typeController.text.isEmpty ||
-          _detailsController.text.isEmpty ||
-          _dateController.text.isEmpty) {
+    Future<void> addRecord(BuildContext context) async {
+      if (typeController.text.isEmpty ||
+          detailsController.text.isEmpty ||
+          dateController.text.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please fill in all required fields')),
         );
@@ -56,9 +56,9 @@ class AddReminderForm extends StatefulWidget {
       try {
         final user = FirebaseAuth.instance.currentUser;
         if (user != null) {
-          DateTime recordDate = DateTime.parse(_dateController.text.trim());
-          if (_timeController.text.isNotEmpty) {
-            final timeParts = _timeController.text.split(':');
+          DateTime recordDate = DateTime.parse(dateController.text.trim());
+          if (timeController.text.isNotEmpty) {
+            final timeParts = timeController.text.split(':');
             final hour = int.parse(timeParts[0]);
             final minute = int.parse(timeParts[1]);
             recordDate = DateTime(
@@ -74,8 +74,8 @@ class AddReminderForm extends StatefulWidget {
             id: '',
             userId: user.uid,
             petId: petId,
-            type: _typeController.text.trim(),
-            details: _detailsController.text.trim(),
+            type: typeController.text.trim(),
+            details: detailsController.text.trim(),
             date: recordDate,
             createdAt: DateTime.now(),
           );
@@ -84,10 +84,10 @@ class AddReminderForm extends StatefulWidget {
               .collection('records')
               .add(record.toFirestore());
 
-          _typeController.clear();
-          _detailsController.clear();
-          _dateController.clear();
-          _timeController.clear();
+          typeController.clear();
+          detailsController.clear();
+          dateController.clear();
+          timeController.clear();
 
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Record added successfully')),
@@ -115,7 +115,7 @@ class AddReminderForm extends StatefulWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextField(
-                      controller: _typeController,
+                      controller: typeController,
                       decoration: const InputDecoration(
                         labelText: 'Record Type',
                         border: OutlineInputBorder(),
@@ -123,7 +123,7 @@ class AddReminderForm extends StatefulWidget {
                     ),
                     const SizedBox(height: 8),
                     TextField(
-                      controller: _detailsController,
+                      controller: detailsController,
                       decoration: const InputDecoration(
                         labelText: 'Details',
                         border: OutlineInputBorder(),
@@ -131,20 +131,20 @@ class AddReminderForm extends StatefulWidget {
                     ),
                     const SizedBox(height: 8),
                     TextField(
-                      controller: _dateController,
+                      controller: dateController,
                       decoration: InputDecoration(
                         labelText: 'Date',
                         border: OutlineInputBorder(),
                         suffixIcon: IconButton(
                           icon: const Icon(Icons.calendar_today),
-                          onPressed: () => _selectDate(context),
+                          onPressed: () => selectDate(context),
                         ),
                       ),
                       readOnly: true,
                     ),
                     const SizedBox(height: 8),
                     TextField(
-                      controller: _timeController,
+                      controller: timeController,
                       decoration: InputDecoration(
                         labelText: 'Time',
                         border: OutlineInputBorder(),
@@ -156,7 +156,7 @@ class AddReminderForm extends StatefulWidget {
                               initialTime: TimeOfDay.now(),
                             );
                             if (pickedTime != null) {
-                              _timeController.text =
+                              timeController.text =
                               '${pickedTime.hour.toString().padLeft(2, '0')}:${pickedTime.minute.toString().padLeft(2, '0')}';
                             }
                           },
@@ -175,14 +175,14 @@ class AddReminderForm extends StatefulWidget {
               ),
               ElevatedButton(
                 onPressed: () {
-                  _addRecord(context);
+                  addRecord(context);
                   Navigator.pop(context);
                 },
-                child: const Text('Add'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFe74d3d),
                   foregroundColor: Colors.white,
                 ),
+                child: const Text('Add'),
               ),
             ],
           );
@@ -194,10 +194,10 @@ class AddReminderForm extends StatefulWidget {
         }
       },
     ).whenComplete(() {
-      _typeController.dispose();
-      _detailsController.dispose();
-      _dateController.dispose();
-      _timeController.dispose();
+      typeController.dispose();
+      detailsController.dispose();
+      dateController.dispose();
+      timeController.dispose();
     });
   }
 }
