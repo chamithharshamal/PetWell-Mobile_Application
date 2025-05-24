@@ -16,6 +16,7 @@ class AddReminderForm extends StatefulWidget {
     final TextEditingController detailsController = TextEditingController();
     final TextEditingController dateController = TextEditingController();
     final TextEditingController timeController = TextEditingController();
+    final scaffoldMessenger = ScaffoldMessenger.of(context); // Store ScaffoldMessengerState
 
     Future<void> selectDate(BuildContext context) async {
       final DateTime? picked = await showDatePicker(
@@ -34,7 +35,7 @@ class AddReminderForm extends StatefulWidget {
         if (pickedTime != null) {
           dateController.text = picked.toString().substring(0, 10);
           timeController.text =
-          '${pickedTime.hour.toString().padLeft(2, '0')}:${pickedTime.minute.toString().padLeft(2, '0')}';
+              '${pickedTime.hour.toString().padLeft(2, '0')}:${pickedTime.minute.toString().padLeft(2, '0')}';
           return;
         }
 
@@ -47,7 +48,7 @@ class AddReminderForm extends StatefulWidget {
       if (typeController.text.isEmpty ||
           detailsController.text.isEmpty ||
           dateController.text.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        scaffoldMessenger.showSnackBar(
           const SnackBar(content: Text('Please fill in all required fields')),
         );
         return;
@@ -89,14 +90,20 @@ class AddReminderForm extends StatefulWidget {
           dateController.clear();
           timeController.clear();
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Record added successfully')),
-          );
+          // Only show SnackBar and pop if context is still valid
+          if (context.mounted) {
+            scaffoldMessenger.showSnackBar(
+              const SnackBar(content: Text('Record added successfully')),
+            );
+            Navigator.pop(context); // Pop dialog after successful addition
+          }
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to add record: $e')),
-        );
+        if (context.mounted) {
+          scaffoldMessenger.showSnackBar(
+            SnackBar(content: Text('Failed to add record: $e')),
+          );
+        }
       }
     }
 
@@ -157,7 +164,7 @@ class AddReminderForm extends StatefulWidget {
                             );
                             if (pickedTime != null) {
                               timeController.text =
-                              '${pickedTime.hour.toString().padLeft(2, '0')}:${pickedTime.minute.toString().padLeft(2, '0')}';
+                                  '${pickedTime.hour.toString().padLeft(2, '0')}:${pickedTime.minute.toString().padLeft(2, '0')}';
                             }
                           },
                         ),
@@ -175,8 +182,7 @@ class AddReminderForm extends StatefulWidget {
               ),
               ElevatedButton(
                 onPressed: () {
-                  addRecord(context);
-                  Navigator.pop(context);
+                  addRecord(context); // Call addRecord without immediate pop
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFe74d3d),
@@ -187,10 +193,10 @@ class AddReminderForm extends StatefulWidget {
             ],
           );
         } catch (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          scaffoldMessenger.showSnackBar(
             SnackBar(content: Text('Error showing dialog: $e')),
           );
-          return const SizedBox.shrink(); // Return an empty widget if error occurs
+          return const SizedBox.shrink();
         }
       },
     ).whenComplete(() {
@@ -205,7 +211,6 @@ class AddReminderForm extends StatefulWidget {
 class _AddReminderFormState extends State<AddReminderForm> {
   @override
   Widget build(BuildContext context) {
-    // This widget isn't used directly; we use showAddReminderDialog instead
     return Container();
   }
 
