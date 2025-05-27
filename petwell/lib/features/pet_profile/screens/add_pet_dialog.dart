@@ -43,10 +43,9 @@ class _AddPetDialogState extends State<AddPetDialog> {
       } else {
         imageBytes = await File(image.path).readAsBytes();
       }
-      String base64Image = base64Encode(imageBytes);
       setState(() {
-        _imageUrl = base64Image;
-        _imageBytes = imageBytes; // Store bytes for immediate display
+        _imageBytes = imageBytes;
+        _imageUrl = base64Encode(imageBytes!);
       });
     }
   }
@@ -56,180 +55,223 @@ class _AddPetDialogState extends State<AddPetDialog> {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         final pet = Pet(
-          id: '', // Will be set by Firestore
+          id: '',
           userId: user.uid,
           name: _nameController.text.trim(),
           species: _speciesController.text.trim(),
-          breed:
-              _breedController.text.trim().isEmpty ? null : _breedController.text.trim(),
-          age: int.parse(_ageController.text),
-          imageUrl: _imageUrl, // Store the base64 string or null
+          breed: _breedController.text.trim().isEmpty
+              ? null
+              : _breedController.text.trim(),
+          age: int.tryParse(_ageController.text) ?? 0,
+          imageUrl: _imageUrl,
           createdAt: DateTime.now(),
         );
         try {
-          await FirebaseFirestore.instance
-              .collection('pets')
-              .add(pet.toFirestore());
-          Navigator.pop(context); // Close dialog
+          await FirebaseFirestore.instance.collection('pets').add(pet.toFirestore());
+          Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Pet added successfully')),
+            const SnackBar(content: Text('🐾 Pet added successfully')),
           );
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to add pet: $e')),
+            SnackBar(content: Text('❌ Failed to add pet: $e')),
           );
         }
       }
     }
   }
 
-  @override
+@override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Colors.grey[100],
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0),
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+      title: const Text(
+        'Add New Pet',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFFe74d3d),
+        ),
       ),
-      title: Text('Add New Pet',
-          style: TextStyle(
-              color: Colors.teal[800], fontWeight: FontWeight.bold)),
       content: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Circular Image Display
+              // Pet Image Upload
               Center(
-                child: Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.grey[300],
-                  ),
-                  child: ClipOval(
-                    child: _imageBytes != null
-                        ? Image.memory(
-                            _imageBytes!,
-                            width: 120,
-                            height: 120,
-                            fit: BoxFit.cover,
-                          )
-                        : const Icon(Icons.image,
-                            size: 60, color: Colors.grey), // Placeholder Icon
-                  ),
+                child: Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 60,
+                      backgroundColor: Colors.grey[300],
+                      backgroundImage:
+                          _imageBytes != null ? MemoryImage(_imageBytes!) : null,
+                      child: _imageBytes == null
+                          ? const Icon(Icons.pets, size: 50, color: Colors.grey)
+                          : null,
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            )
+                          ],
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.add_a_photo, color: Color(0xFFe74d3d)),
+                          onPressed: _pickImage,
+                          iconSize: 24,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
+
               const SizedBox(height: 20),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.teal[400],
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  textStyle: const TextStyle(fontWeight: FontWeight.bold),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                ),
-                onPressed: _pickImage,
-                child: const Text('Upload Image',
-                    style: TextStyle(color: Colors.white)),
-              ),
-              const SizedBox(height: 20),
+
+              // Name Field
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
-                  labelText: 'Name',
-                  labelStyle: TextStyle(color: Colors.grey[700]),
+                  labelText: 'Pet Name',
+                  labelStyle: const TextStyle(color: Colors.black54),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.teal[400]!),
-                    borderRadius: BorderRadius.circular(10.0),
+                    borderSide: const BorderSide(color: Color(0xFFe74d3d)),
+                    borderRadius: BorderRadius.circular(12),
                   ),
+                  filled: true,
+                  fillColor: const Color.fromARGB(255, 255, 255, 255),
                 ),
                 validator: (value) =>
-                    value?.isEmpty ?? true ? 'Enter pet name' : null,
+                    value == null  value.trim().isEmpty ? 'Please enter a name' : null,
               ),
+
               const SizedBox(height: 12),
+
+              // Species Field
               TextFormField(
                 controller: _speciesController,
                 decoration: InputDecoration(
                   labelText: 'Species',
-                  labelStyle: TextStyle(color: Colors.grey[700]),
+                  labelStyle: const TextStyle(color: Colors.black54),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.teal[400]!),
-                    borderRadius: BorderRadius.circular(10.0),
+                    borderSide: const BorderSide(color: Color(0xFFe74d3d)),
+                    borderRadius: BorderRadius.circular(12),
                   ),
+                  filled: true,
+                  fillColor: const Color.fromARGB(255, 255, 255, 255),
                 ),
                 validator: (value) =>
-                    value?.isEmpty ?? true ? 'Enter species' : null,
+                    (value == null  value.trim().isEmpty) ? 'Enter species' : null,
               ),
-              const SizedBox(height: 12),
+
+const SizedBox(height: 12),
+
+              // Breed Field
               TextFormField(
                 controller: _breedController,
                 decoration: InputDecoration(
                   labelText: 'Breed (Optional)',
-                  labelStyle: TextStyle(color: Colors.grey[700]),
+                  labelStyle: const TextStyle(color: Colors.black54),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.teal[400]!),
-                    borderRadius: BorderRadius.circular(10.0),
+                    borderSide: const BorderSide(color: Color(0xFFe74d3d)),
+                    borderRadius: BorderRadius.circular(12),
                   ),
+                  filled: true,
+                  fillColor: const Color.fromARGB(255, 255, 255, 255),
                 ),
               ),
+
               const SizedBox(height: 12),
+
+              // Age Field
               TextFormField(
                 controller: _ageController,
+                keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   labelText: 'Age',
-                  labelStyle: TextStyle(color: Colors.grey[700]),
+                  labelStyle: const TextStyle(color: Colors.black54),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.teal[400]!),
-                    borderRadius: BorderRadius.circular(10.0),
+                    borderSide: const BorderSide(color: Color(0xFFe74d3d)),
+                    borderRadius: BorderRadius.circular(12),
                   ),
+                  filled: true,
+                  fillColor: const Color.fromARGB(255, 255, 255, 255),
                 ),
-                keyboardType: TextInputType.number,
                 validator: (value) =>
-                    value?.isEmpty ?? true ? 'Enter age' : null,
+                    value == null || value.trim().isEmpty ? 'Enter age' : null,
               ),
-              const SizedBox(height: 20),
+
+              const SizedBox(height: 24),
             ],
           ),
         ),
       ),
+      actionsPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       actions: [
-        TextButton(
-          style: TextButton.styleFrom(
-            foregroundColor: Colors.grey[700],
-            textStyle: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
-        ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.teal[400],
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            textStyle: const TextStyle(fontWeight: FontWeight.bold),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.black,
+                  side: const BorderSide(color: Color(0xFFe74d3d)),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: Navigator.of(context).pop,
+                child: const Text('Cancel'),
+              ),
             ),
-          ),
-          onPressed: _submit,
-          child: const Text('Add Pet', style: TextStyle(color: Colors.white)),
-        ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFe74d3d),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: _submit,
+                child: const Text(
+                  'Add Pet',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
+          ],
+        )
       ],
     );
   }
