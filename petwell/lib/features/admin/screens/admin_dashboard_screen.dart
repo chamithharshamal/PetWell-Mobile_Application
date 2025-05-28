@@ -321,8 +321,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           }
         },
         backgroundColor: const Color.fromARGB(255, 234, 231, 231),
-        selectedItemColor: const Color(0xFFe74d3d),
-        unselectedItemColor: const Color(0xFFe74d3d),
+        selectedItemColor: const Color(0xFFFF8C42),
+        unselectedItemColor: const Color(0xFFFF8C42),
         selectedFontSize: 12,
         unselectedFontSize: 10,
         items: const [
@@ -433,7 +433,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFFe74d3d),
+                            color: Color(0xFFFF8C42),
                           ),
                         ),
                       );
@@ -466,7 +466,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                   trailing: IconButton(
                                     icon: const Icon(
                                       Icons.delete,
-                                      color: Colors.red,
+                                      color: Color(0xFFFF8C42),
                                     ),
                                     onPressed: () => _deletePet(pet.id),
                                   ),
@@ -503,7 +503,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.logout, color: Colors.red),
+                icon: const Icon(Icons.logout, color: Color(0xFFFF8C42)),
                 onPressed: _logout,
               ),
             ],
@@ -585,7 +585,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFFe74d3d),
+                            color: Color(0xFFFF8C42),
                           ),
                         ),
                       );
@@ -604,7 +604,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                 ),
                                 child: ExpansionTile(
                                   leading: CircleAvatar(
-                                    backgroundColor: const Color(0xFFe74d3d),
+                                    backgroundColor: const Color(0xFFFF8C42),
                                     child: Text(
                                       data['name']
                                               ?.substring(0, 1)
@@ -633,7 +633,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                             children: [
                                               const Icon(
                                                 Icons.email,
-                                                color: Color(0xFFe74d3d),
+                                                color: Color(0xFFFF8C42),
                                               ),
                                               const SizedBox(width: 8),
                                               Text(
@@ -646,7 +646,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                             children: [
                                               const Icon(
                                                 Icons.calendar_today,
-                                                color: Color(0xFFe74d3d),
+                                                color: Color(0xFFFF8C42),
                                               ),
                                               const SizedBox(width: 8),
                                               Text(
@@ -720,7 +720,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                                     trailing: IconButton(
                                                       icon: const Icon(
                                                         Icons.delete,
-                                                        color: Colors.red,
+                                                        color: Color(0xFFFF8C42),
                                                       ),
                                                       onPressed:
                                                           () => _deletePet(
@@ -738,12 +738,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                             child: TextButton.icon(
                                               icon: const Icon(
                                                 Icons.delete,
-                                                color: Colors.red,
+                                                color: Color(0xFFFF8C42),
                                               ),
                                               label: const Text(
                                                 'Delete User',
                                                 style: TextStyle(
-                                                  color: Colors.red,
+                                                  color:Color(0xFFFF8C42),
                                                 ),
                                               ),
                                               onPressed:
@@ -811,13 +811,13 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       hintText: 'Enter title here',
                       prefixIcon: const Icon(
                         Icons.title,
-                        color: Color(0xFFe74d3d),
+                        color: Color(0xFFFF8C42),
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: const Color(0xFFe74d3d)),
+                        borderSide: BorderSide(color: const Color(0xFFFF8C42)),
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
@@ -833,13 +833,13 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       hintText: 'Write something...',
                       prefixIcon: const Icon(
                         Icons.article,
-                        color: Color(0xFFe74d3d),
+                        color: Color(0xFFFF8C42),
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: const Color(0xFFe74d3d)),
+                        borderSide: BorderSide(color: const Color(0xFFFF8C42)),
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
@@ -853,7 +853,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       icon: const Icon(Icons.image),
                       label: const Text('Pick Image'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFe74d3d),
+                        backgroundColor: const Color(0xFFFF8C42),
                         foregroundColor: Colors.white,
                         padding: EdgeInsets.symmetric(
                           horizontal: 15,
@@ -889,10 +889,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                       _selectedImageBase64 = null;
                                     });
                                   },
-                          icon: const Icon(Icons.delete, color: Colors.red),
+                          icon: const Icon(Icons.delete, color: Color(0xFFFF8C42)),
                           label: const Text(
                             'Remove Image',
-                            style: TextStyle(color: Colors.red),
+                            style: TextStyle(color: Color(0xFFFF8C42)),
                           ),
                         ),
                       ],
@@ -904,7 +904,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     child: ElevatedButton(
                       onPressed: _isUploading ? null : _addBlogPost,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFe74d3d),
+                        backgroundColor: const Color(0xFFFF8C42),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
@@ -1123,7 +1123,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                   const Icon(
                                     Icons.access_time,
                                     size: 40,
-                                    color: Color(0xFFe74d3d),
+                                    color: Color(0xFFFF8C42),
                                   ),
                                   const SizedBox(width: 16),
                                   Text(
@@ -1166,7 +1166,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                   const Icon(
                                     Icons.pets,
                                     size: 40,
-                                    color: Color(0xFFe74d3d),
+                                    color: Color(0xFFFF8C42),
                                   ),
                                   const SizedBox(width: 16),
                                   Column(
@@ -1223,7 +1223,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                       mostActiveTimePeriod ?? 'N/A',
                                       style: const TextStyle(
                                         fontSize: 18,
-                                        color: Color(0xFFe74d3d),
+                                        color: Color(0xFFFF8C42),
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -1257,7 +1257,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                       mostCommonRecordType ?? 'N/A',
                                       style: const TextStyle(
                                         fontSize: 18,
-                                        color: Color(0xFFe74d3d),
+                                        color: Color(0xFFFF8C42),
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -1298,7 +1298,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Icon(icon, size: 40, color: const Color(0xFFe74d3d)),
+            Icon(icon, size: 40, color: const Color(0xFFFF8C42)),
             const SizedBox(height: 8),
             Text(
               value,
