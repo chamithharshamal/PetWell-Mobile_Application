@@ -17,7 +17,7 @@ class BlogPostScreen extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: const Color(0xFFe74d3d),
+        backgroundColor: const Color(0xFFFF8C42),
         elevation: 0,
       ),
       backgroundColor: const Color(0xFFecdaca),
@@ -68,7 +68,7 @@ class BlogPostScreen extends StatelessWidget {
                 const SizedBox(height: 20),
                 Row(
                   children: [
-                    const Icon(Icons.book, color: Color(0xFFe74d3d), size: 24),
+                    const Icon(Icons.book, color: Color(0xFFFF8C42), size: 24),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -89,7 +89,7 @@ class BlogPostScreen extends StatelessWidget {
                   children: [
                     const Icon(
                       Icons.person,
-                      color: Color(0xFFe74d3d),
+                      color: Color(0xFFFF8C42),
                       size: 18,
                     ),
                     const SizedBox(width: 8),
@@ -98,7 +98,7 @@ class BlogPostScreen extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 16,
                         fontStyle: FontStyle.italic,
-                        color: Color(0xFFe74d3d),
+                        color: Color(0xFFFF8C42),
                       ),
                     ),
                   ],
@@ -109,7 +109,7 @@ class BlogPostScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     border: Border(
                       top: BorderSide(
-                        color: Color(0xFFe74d3d).withOpacity(0.3),
+                        color: Color(0xFFFF8C42).withOpacity(0.3),
                         width: 1,
                       ),
                     ),
