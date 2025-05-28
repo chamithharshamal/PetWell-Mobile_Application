@@ -1,9 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart'; 
-import 'package:sign_in_with_apple/sign_in_with_apple.dart'; 
-import '../screens/start_page.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../../home/home_screen.dart';
 
 class AuthForm extends StatefulWidget {
@@ -47,13 +46,12 @@ class _AuthFormState extends State<AuthForm> {
   Future<void> _signInWithFacebook() async {
     try {
       final LoginResult result = await FacebookAuth.instance.login(
-          permissions: [
-            'public_profile',
-            'email'
-          ]); // Request email as well <sup data-citation="1" className="inline select-none [&>a]:rounded-2xl [&>a]:border [&>a]:px-1.5 [&>a]:py-0.5 [&>a]:transition-colors shadow [&>a]:bg-ds-bg-subtle [&>a]:text-xs [&>svg]:w-4 [&>svg]:h-4 relative -top-[2px] citation-shimmer"><a href="#" title="Reference 1 (source not available)">1</a></sup>
+        permissions: ['public_profile', 'email'],
+      ); // Request email as well <sup data-citation="1" className="inline select-none [&>a]:rounded-2xl [&>a]:border [&>a]:px-1.5 [&>a]:py-0.5 [&>a]:transition-colors shadow [&>a]:bg-ds-bg-subtle [&>a]:text-xs [&>svg]:w-4 [&>svg]:h-4 relative -top-[2px] citation-shimmer"><a href="#" title="Reference 1 (source not available)">1</a></sup>
       if (result.status == LoginStatus.success) {
-        final OAuthCredential credential =
-            FacebookAuthProvider.credential(result.accessToken!.token);
+        final OAuthCredential credential = FacebookAuthProvider.credential(
+          result.accessToken!.token,
+        );
         await FirebaseAuth.instance.signInWithCredential(credential);
         _navigateToHomeScreen();
       } else {
@@ -62,9 +60,9 @@ class _AuthFormState extends State<AuthForm> {
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Facebook sign-in failed: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Facebook sign-in failed: $e')));
     }
   }
 
@@ -73,11 +71,11 @@ class _AuthFormState extends State<AuthForm> {
     try {
       final AuthorizationCredentialAppleID appleCredential =
           await SignInWithApple.getAppleIDCredential(
-        scopes: [
-          AppleIDAuthorizationScopes.email,
-          AppleIDAuthorizationScopes.fullName,
-        ],
-      );
+            scopes: [
+              AppleIDAuthorizationScopes.email,
+              AppleIDAuthorizationScopes.fullName,
+            ],
+          );
 
       final OAuthCredential credential = OAuthProvider('apple.com').credential(
         idToken: appleCredential.identityToken,
@@ -87,18 +85,16 @@ class _AuthFormState extends State<AuthForm> {
       await FirebaseAuth.instance.signInWithCredential(credential);
       _navigateToHomeScreen();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Apple sign-in failed: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Apple sign-in failed: $e')));
     }
   }
 
   void _navigateToHomeScreen() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (context) => const HomeScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const HomeScreen()),
     );
   }
 
@@ -116,13 +112,16 @@ class _AuthFormState extends State<AuthForm> {
             enabled: !widget.isLoading,
             decoration: InputDecoration(
               labelText: 'Email',
-              labelStyle: const TextStyle(color: Colors.black),
-              prefixIcon: const Icon(Icons.email_outlined, color: Colors.black),
-              enabledBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.black),
+              prefixIcon: Icon(Icons.email_outlined),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
-              focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.black, width: 2),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Color(0xFFe74d3d), // Same red color
+                  width: 2,
+                ),
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
             validator: (value) {
@@ -146,30 +145,16 @@ class _AuthFormState extends State<AuthForm> {
             enabled: !widget.isLoading,
             decoration: InputDecoration(
               labelText: 'Password',
-              labelStyle: const TextStyle(color: Colors.black),
-              prefixIcon: const Icon(Icons.lock_outline, color: Colors.black),
-              enabledBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.black),
+              prefixIcon: Icon(Icons.lock_outline),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
-              focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.black, width: 2),
-              ),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _isPasswordVisible
-                      ? Icons.visibility_outlined
-                      : Icons.visibility_off_outlined,
-                  color: Colors.black,
-                ),
-                onPressed: widget.isLoading
-                    ? null
-                    : () {
-                        setState(() {
-                          _isPasswordVisible = !_isPasswordVisible;
-                        });
-                      },
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Color(0xFFe74d3d), width: 2),
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
+
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter your password';
@@ -189,15 +174,15 @@ class _AuthFormState extends State<AuthForm> {
               controller: _confirmPasswordController,
               obscureText: !_isPasswordVisible,
               enabled: !widget.isLoading,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Confirm Password',
-                labelStyle: TextStyle(color: Colors.black),
-                prefixIcon: Icon(Icons.lock_outline, color: Colors.black),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black),
+                prefixIcon: Icon(Icons.lock_outline),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black, width: 2),
+                  borderSide: BorderSide(color: Color(0xFFe74d3d), width: 2),
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
               validator: (value) {
@@ -218,40 +203,41 @@ class _AuthFormState extends State<AuthForm> {
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
-                onPressed: widget.isLoading
-                    ? null
-                    : () async {
-                        if (_emailController.text.isNotEmpty) {
-                          try {
-                            await FirebaseAuth.instance
-                                .sendPasswordResetEmail(
-                                  email: _emailController.text.trim(),
-                                );
+                onPressed:
+                    widget.isLoading
+                        ? null
+                        : () async {
+                          if (_emailController.text.isNotEmpty) {
+                            try {
+                              await FirebaseAuth.instance
+                                  .sendPasswordResetEmail(
+                                    email: _emailController.text.trim(),
+                                  );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Password reset email sent'),
+                                ),
+                              );
+                            } on FirebaseAuthException catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    e.message ?? 'Failed to send reset email',
+                                  ),
+                                ),
+                              );
+                            }
+                          } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text('Password reset email sent'),
-                              ),
-                            );
-                          } on FirebaseAuthException catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  e.message ?? 'Failed to send reset email',
-                                ),
+                                content: Text('Please enter your email'),
                               ),
                             );
                           }
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Please enter your email'),
-                            ),
-                          );
-                        }
-                      },
+                        },
                 child: const Text(
                   'Forgot Password?',
-                  style: TextStyle(color: Color(0xFFE74D3D)),
+                  style: TextStyle(color: Color(0xFFFF8C42)),
                 ),
               ),
             ),
@@ -262,25 +248,26 @@ class _AuthFormState extends State<AuthForm> {
           ElevatedButton(
             onPressed: widget.isLoading ? null : _submit,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFE74D3D),
+              backgroundColor: const Color(0xFFFF8C42),
               padding: const EdgeInsets.symmetric(vertical: 15),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: widget.isLoading
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
+            child:
+                widget.isLoading
+                    ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                    : Text(
+                      widget.isSignIn ? 'Sign In' : 'Sign Up',
+                      style: const TextStyle(color: Colors.white),
                     ),
-                  )
-                : Text(
-                    widget.isSignIn ? 'Sign In' : 'Sign Up',
-                    style: const TextStyle(color: Colors.white),
-                  ),
           ),
 
           const SizedBox(height: 24),
@@ -308,34 +295,36 @@ class _AuthFormState extends State<AuthForm> {
             children: [
               _buildSocialButton(
                 icon: Icons.g_mobiledata,
-                color: Colors.red,
-                onPressed: widget.isLoading
-                    ? null
-                    : () async {
-                        try {
-                          final GoogleSignIn googleSignIn = GoogleSignIn();
-                          final GoogleSignInAccount? googleUser =
-                              await googleSignIn.signIn();
-                          if (googleUser == null) return; // User canceled
+                color: Color(0xFFFF8C42),
+                onPressed:
+                    widget.isLoading
+                        ? null
+                        : () async {
+                          try {
+                            final GoogleSignIn googleSignIn = GoogleSignIn();
+                            final GoogleSignInAccount? googleUser =
+                                await googleSignIn.signIn();
+                            if (googleUser == null) return; // User canceled
 
-                          final GoogleSignInAuthentication googleAuth =
-                              await googleUser.authentication;
-                          final credential = GoogleAuthProvider.credential(
-                            accessToken: googleAuth.accessToken,
-                            idToken: googleAuth.idToken,
-                          );
+                            final GoogleSignInAuthentication googleAuth =
+                                await googleUser.authentication;
+                            final credential = GoogleAuthProvider.credential(
+                              accessToken: googleAuth.accessToken,
+                              idToken: googleAuth.idToken,
+                            );
 
-                          await FirebaseAuth.instance
-                              .signInWithCredential(credential);
-                          _navigateToHomeScreen();
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Google sign-in failed: $e'),
-                            ),
-                          );
-                        }
-                      },
+                            await FirebaseAuth.instance.signInWithCredential(
+                              credential,
+                            );
+                            _navigateToHomeScreen();
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Google sign-in failed: $e'),
+                              ),
+                            );
+                          }
+                        },
               ),
               _buildSocialButton(
                 icon: Icons.facebook,
