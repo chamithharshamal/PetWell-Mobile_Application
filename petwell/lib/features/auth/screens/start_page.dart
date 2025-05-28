@@ -10,7 +10,7 @@ class StartPage extends StatelessWidget {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFFe74d3d), Color(0xFFc0392b)],
+            colors: [Color(0xFFFF8C42), Color(0xFFFF8C42)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -51,7 +51,7 @@ class StartPage extends StatelessWidget {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
-                  foregroundColor: const Color(0xFFe74d3d),
+                  foregroundColor: const Color(0xFFFF8C42),
                   padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(25),
