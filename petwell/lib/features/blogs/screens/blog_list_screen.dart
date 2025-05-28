@@ -25,14 +25,23 @@ class BlogListScreen extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
+
                     Color(0xFFFF8C42),
                     Color(0xFFFF8C42),
+
+                    Color(0xFFe74d3d),
+                    Color(0xFFc0392b),
+
                   ],
                 ),
               ),
               child: FlexibleSpaceBar(
                 title: const Text(
+
                   'PetWell Blog',
+
+                  'PetCare Blog',
+
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
@@ -47,8 +56,13 @@ class BlogListScreen extends StatelessWidget {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
+
                         Color(0xFFFF8C42),
                         Color(0xFFFF8C42),
+
+                        Color(0xFFe74d3d),
+                        Color(0xFFc0392b),
+
                       ],
                     ),
                   ),
@@ -80,7 +94,11 @@ class BlogListScreen extends StatelessWidget {
                   return const SliverFillRemaining(
                     child: Center(
                       child: CircularProgressIndicator(
+
                         valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF8C42)),
+
+                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFe74d3d)),
+
                       ),
                     ),
                   );
@@ -239,7 +257,7 @@ class BlogListScreen extends StatelessWidget {
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) => _buildPlaceholderImage(200),
                         ),
-                       
+
                         Positioned.fill(
                           child: Container(
                             decoration: BoxDecoration(
@@ -272,7 +290,11 @@ class BlogListScreen extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
+
                               color: const Color(0xFFFF8C42).withOpacity(0.1),
+
+                              color: const Color(0xFFe74d3d).withOpacity(0.1),
+
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Row(
@@ -281,14 +303,22 @@ class BlogListScreen extends StatelessWidget {
                                 const Icon(
                                   Icons.person_outline,
                                   size: 14,
+
                                   color: Color(0xFFFF8C42),
+
+                                  color: Color(0xFFe74d3d),
+
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
                                   authorName,
                                   style: const TextStyle(
                                     fontSize: 12,
+
                                     color: Color(0xFFFF8C42),
+
+                                    color: Color(0xFFe74d3d),
+
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -343,7 +373,11 @@ class BlogListScreen extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
+
                                 colors: [Color(0xFFe74d3d), Color(0xFFFF8C42)],
+
+                                colors: [Color(0xFFe74d3d), Color(0xFFc0392b)],
+
                               ),
                               borderRadius: BorderRadius.circular(20),
                             ),
@@ -390,7 +424,11 @@ class BlogListScreen extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: [
             const Color(0xFFe74d3d).withOpacity(0.1),
+
             Color(0xFFFF8C42).withOpacity(0.2),
+
+            const Color(0xFFc0392b).withOpacity(0.2),
+
           ],
         ),
         borderRadius: height == 200 
@@ -404,7 +442,11 @@ class BlogListScreen extends StatelessWidget {
         child: Icon(
           Icons.pets,
           size: 60,
+
           color:Color(0xFFFF8C42),
+
+          color: Color(0xFFe74d3d),
+
         ),
       ),
     );
