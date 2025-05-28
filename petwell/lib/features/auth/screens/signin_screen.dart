@@ -33,7 +33,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white.withOpacity(0.9),
+                    color:Color(0xFFFF8C42).withOpacity(0.9),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.1),
@@ -45,7 +45,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   child: const Icon(
                     Icons.pets,
                     size: 80,
-                    color: Color(0xFFe74d3d),
+                    color: Color(0xFFFFFFFF),
                   ),
                 ),
 
