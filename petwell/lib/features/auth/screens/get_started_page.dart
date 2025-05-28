@@ -1,34 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'signin_screen.dart';
 
-class GetStartedPage extends StatefulWidget {
+class GetStartedPage extends StatelessWidget {
   const GetStartedPage({super.key});
-
-  @override
-  _GetStartedPageState createState() => _GetStartedPageState();
-}
-
-class _GetStartedPageState extends State<GetStartedPage> {
-  int _currentSlide = 0;
-
-  final List<Map<String, String>> slides = [
-    {
-      'image': 'assets/images/slide1.jpg', // Replace with your image path
-      'title': 'Track Health Records',
-      'description': 'Easily monitor your pet’s health with detailed records.',
-    },
-    {
-      'image': 'assets/images/slide2.jpg', // Replace with your image path
-      'title': 'Set Reminders',
-      'description': 'Never miss a vet visit or medication with timely reminders.',
-    },
-    {
-      'image': 'assets/images/slide3.jpg', // Replace with your image path
-      'title': 'Insightful Graphs',
-      'description': 'Visualize your pet’s weight history with clear graphs.',
-    },
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -36,128 +10,92 @@ class _GetStartedPageState extends State<GetStartedPage> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFFe74d3d), Color(0xFFc0392b)],
+            colors: [
+              Color(0xFFFF8C42), // Orange gradient start
+              Color(0xFFFF8C42), // Orange gradient end
+            ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
         ),
         child: SafeArea(
-          child: Column(
-            children: [
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 20),
-                child: Text(
-                  'Get Started with PetCare',
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Animal Image
+                CircleAvatar(
+                  radius: 150,
+                  backgroundColor: Colors.white,
+                  child: ClipOval(
+                    child: Image.asset(
+                      '../../assests/animal_image.png', // Replace with your image path
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const Icon(
+                        Icons.pets,
+                        size: 100,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 32),
+
+                // Welcome Text
+                const Text(
+                  'Your Pet Deserves the Best Care.',
                   style: TextStyle(
-                    fontSize: 28,
+                    fontSize: 30,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
+                  textAlign: TextAlign.center,
                 ),
-              ),
-              Expanded(
-                child: CarouselSlider.builder(
-                  itemCount: slides.length,
-                  itemBuilder: (context, index, realIndex) {
-                    final slide = slides[index];
-                    return Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(15),
-                            child: Image.asset(
-                              slide['image']!,
-                              fit: BoxFit.cover,
-                              height: 200,
-                              width: double.infinity,
-                              errorBuilder: (context, error, stackTrace) => Container(
-                                height: 200,
-                                color: Colors.grey[300],
-                                child: const Center(
-                                  child: Icon(
-                                    Icons.pets,
-                                    size: 50,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          Text(
-                            slide['title']!,
-                            style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            slide['description']!,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.white70,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                  options: CarouselOptions(
-                    height: 400,
-                    autoPlay: true,
-                    autoPlayInterval: const Duration(seconds: 3),
-                    enlargeCenterPage: true,
-                    onPageChanged: (index, reason) {
-                      setState(() {
-                        _currentSlide = index;
-                      });
-                    },
+
+                const SizedBox(height: 8),
+
+                // Subtext
+                const Text(
+                  'Be the best pet parent with PetWell – your digital pet health assistant!',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white70,
                   ),
+                  textAlign: TextAlign.center,
                 ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: slides.asMap().entries.map((entry) {
-                  return Container(
-                    width: 10,
-                    height: 10,
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: _currentSlide == entry.key
-                          ? Colors.white
-                          : Colors.white.withOpacity(0.4),
-                    ),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 30),
-              Center(
-                child: ElevatedButton(
+
+                const SizedBox(height: 32),
+
+                // Get Started Button
+                ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
+                    Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => const SignInScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => const SignInScreen(),
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
-                    foregroundColor: const Color(0xFFe74d3d),
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                    foregroundColor: const Color(0xFFFF8C42),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 40,
+                      vertical: 16,
+                    ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text('Sign In'),
+                  child: const Text(
+                    'Get Started',
+                    style: TextStyle(fontSize: 18),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-            ],
+              ],
+            ),
           ),
         ),
       ),
