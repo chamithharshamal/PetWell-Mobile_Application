@@ -161,7 +161,7 @@ class _AddPetDialogState extends State<AddPetDialog> {
                   fillColor: const Color.fromARGB(255, 255, 255, 255),
                 ),
                 validator: (value) =>
-                    value == null  value.trim().isEmpty ? 'Please enter a name' : null,
+                    (value == null || value.trim().isEmpty) ? 'Please enter a name' : null,
               ),
 
               const SizedBox(height: 12),
@@ -183,7 +183,7 @@ class _AddPetDialogState extends State<AddPetDialog> {
                   fillColor: const Color.fromARGB(255, 255, 255, 255),
                 ),
                 validator: (value) =>
-                    (value == null  value.trim().isEmpty) ? 'Enter species' : null,
+                    (value == null || value.trim().isEmpty) ? 'Enter species' : null,
               ),
 
 const SizedBox(height: 12),
