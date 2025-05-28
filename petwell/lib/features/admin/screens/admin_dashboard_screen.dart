@@ -12,7 +12,7 @@ class Record {
   final String id;
   final String userId;
   final DateTime date;
-  String _searchQuery = '';
+  final String _searchQuery = '';
 
   Record({required this.id, required this.userId, required this.date});
 
@@ -185,7 +185,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
       for (var doc in recordsSnapshot.docs) {
         try {
-          final data = doc.data() as Map<String, dynamic>;
+          final data = doc.data();
           // Extract fields safely
           final userId = data['userId'] as String? ?? '';
           final recordType = data['type'] as String? ?? 'Unknown';
@@ -256,7 +256,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       // Most common pet species
       Map<String, int> speciesCount = {};
       for (var pet in petsSnapshot.docs) {
-        final data = pet.data() as Map<String, dynamic>;
+        final data = pet.data();
         final species = data['species'] as String? ?? 'Unknown';
         speciesCount[species] = (speciesCount[species] ?? 0) + 1;
       }
@@ -300,7 +300,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> _screens = [
+    final List<Widget> screens = [
       _buildUsersTab(),
       _buildPetsTab(),
       _buildBlogsTab(),
@@ -308,7 +308,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     ];
 
     return Scaffold(
-      body: _screens[_selectedIndex],
+      body: screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) {
