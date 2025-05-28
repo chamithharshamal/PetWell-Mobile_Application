@@ -4,12 +4,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import '../pets_profile/screens/add_pet_dialog.dart';
+import '../pet_profile/screens/add_pet_dialog.dart';
 import '../blogs/screens/blog_list_screen.dart';
 import '../blogs/screens/blog_post_screen.dart';
-import '../pets_profile/models/pet_model.dart';
-import '../pets_profile/screens/pet_details_screen.dart';
+import '../pet_profile/models/pet_model.dart';
+import '../pet_profile/screens/pet_details_screen.dart';
 import 'profile_screen.dart';
+import 'package:geolocator/geolocator.dart';
+import '../../services/weather_service.dart';
+import 'package:weather_icons/weather_icons.dart';
 
 extension StringExtension on String {
   String capitalize() {
@@ -36,11 +39,27 @@ class _HomeScreenState extends State<HomeScreen>
   late Animation<Offset> _slideAnimation;
   bool _isRecordsPanelVisible = false;
   Map<DateTime, List<Map<String, dynamic>>> _events = {};
+  Map<String, dynamic> _weatherSuggestion = {
+    'message': 'Fetching weather...',
+    'icon': 'cloud',
+  };
+  final WeatherService _weatherService = WeatherService();
 
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) {
+      return 'Good Morning';
+    } else if (hour < 17) {
+      return 'Good Afternoon';
+    } else {
+      return 'Good Evening';
+    }
+  }
   @override
   void initState() {
     super.initState();
     _fetchUserName();
+    _fetchWeatherSuggestion();
     _timer = Timer.periodic(const Duration(seconds: 5), (Timer timer) {
       if (_postCount == 0) return;
       if (_currentPage < (_postCount - 1)) {
@@ -67,6 +86,297 @@ class _HomeScreenState extends State<HomeScreen>
     ).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
+  }
+
+Future<void> _fetchWeatherSuggestion() async {
+  try {
+    print('Fetching weather suggestion...');
+    final position = await _weatherService.getCurrentLocation();
+    print('Location: ${position.latitude}, ${position.longitude}');
+    final weatherData = await _weatherService.getWeather(
+      position.latitude,
+      position.longitude,
+    );
+    print('Weather data: $weatherData');
+    setState(() {
+      final suggestion = _weatherService.getWeatherSuggestion(weatherData);
+      _weatherSuggestion = {
+        'message': suggestion['message'], // Assign the message string
+        'icon': suggestion['icon'], // Assign the icon string
+      };
+    });
+  } catch (e, stackTrace) {
+    setState(() {
+      _weatherSuggestion = {
+        'message': 'Weather data unavailable. Please try again later.',
+        'icon': 'cloud',
+      };
+    });
+    print('Error fetching weather: $e');
+    print('Stack trace: $stackTrace');
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Weather Error'),
+        content: const Text(
+            'Unable to fetch weather data. Please check your internet connection or try again later.'),
+        actions: [
+          TextButton(
+            child: const Text('OK'),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+  Widget _buildWeatherIcon(String iconType) {
+    switch (iconType) {
+      case 'sun':
+        return const Icon(
+          WeatherIcons.day_sunny,
+          color: Color(0xFFFF8C42),
+          size: 30,
+        );
+      case 'rain':
+        return const Icon(
+          WeatherIcons.rain,
+          color: Color(0xFFFF8C42),
+          size: 30,
+        );
+      case 'hot':
+        return const Icon(
+          WeatherIcons.hot,
+          color: Color(0xFFFF8C42),
+          size: 30,
+        );
+      case 'cold':
+        return const Icon(
+          WeatherIcons.snow,
+          color: Color(0xFFFF8C42),
+          size: 30,
+        );
+      case 'cloud':
+      default:
+        return const Icon(
+          WeatherIcons.cloud,
+          color: Color(0xFFFF8C42),
+          size: 30,
+        );
+    }
+  }
+
+  Widget _buildFeaturedPostCard(
+    BuildContext context,
+    Map<String, dynamic> blogData,
+  ) {
+    final title = blogData['title'] as String? ?? 'Untitled';
+    final content = blogData['content']?.toString() ?? '';
+    final excerpt =
+        content.length > 120 ? '${content.substring(0, 120)}...' : content;
+    final imageBase64 = blogData['imageBase64'] as String?;
+    final authorName = blogData['authorName'] as String? ?? 'Unknown Author';
+    final createdAt =
+        (blogData['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now();
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Material(
+        elevation: 0,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+                spreadRadius: 0,
+              ),
+            ],
+          ),
+          child: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BlogPostScreen(blogData: blogData),
+                ),
+              );
+            },
+            borderRadius: BorderRadius.circular(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Image Section
+                if (imageBase64 != null && imageBase64.isNotEmpty)
+                  ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                    child: Stack(
+                      children: [
+                        Image.memory(
+                          base64Decode(imageBase64),
+                          width: double.infinity,
+                          height: 150,
+                          fit: BoxFit.cover,
+                          errorBuilder:
+                              (context, error, stackTrace) =>
+                                  _buildFeaturedPlaceholderImage(140),
+                        ),
+                        Positioned.fill(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.transparent,
+                                  Colors.black.withOpacity(0.1),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                else
+                  _buildFeaturedPlaceholderImage(140),
+
+                // Content Section
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 8),
+
+                        // Title
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF2C3E50),
+                            height: 1.2,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 6),
+
+                        // Excerpt
+                        Expanded(
+                          child: Text(
+                            excerpt,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                              height: 1.3,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+
+                        // Read More Button
+                        Row(
+                          children: [
+                            const Spacer(),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFFe74d3d),
+                                    Color(0xFFFF8C42),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'Read More',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  SizedBox(width: 4),
+                                  Icon(
+                                    Icons.arrow_forward_ios,
+                                    size: 10,
+                                    color: Colors.white,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFeaturedPlaceholderImage(double height) {
+    return Container(
+      width: double.infinity,
+      height: height,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFFe74d3d).withOpacity(0.1),
+            Color(0xFFFF8C42).withOpacity(0.2),
+          ],
+        ),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+      child: const Center(
+        child: Icon(Icons.pets, size: 40, color: Color(0xFFFF8C42)),
+      ),
+    );
+  }
+
+  String _formatFeaturedDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
+
+    if (difference.inDays == 0) {
+      return 'Today';
+    } else if (difference.inDays == 1) {
+      return 'Yesterday';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays}d ago';
+    } else {
+      return '${date.day}/${date.month}/${date.year}';
+    }
   }
 
   Future<void> _fetchUserName() async {
@@ -198,79 +508,133 @@ class _HomeScreenState extends State<HomeScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('PetWell', style: TextStyle(color: Colors.white)),
-        backgroundColor: const Color(0xFFe74d3d),
+        title: const Text(
+          'PetWell',
+          style: TextStyle(
+            color: Color(0xFFFF8C42),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications, color: Colors.white),
+            icon: const Icon(Icons.notifications, color: Color(0xFFFF8C42)),
             onPressed: _toggleRecordsPanel,
+            iconSize: 28.0,
           ),
         ],
       ),
-      backgroundColor: const Color(0xFFecdaca),
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       body: Stack(
         children: [
           user == null
               ? const Center(child: Text('Please sign in'))
               : SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Welcome Section
-                    Container(
-                      padding: const EdgeInsets.all(16.0),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Color(0xFFe74d3d), Color(0xFFf1948a)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.3),
-                            spreadRadius: 2,
-                            blurRadius: 5,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.pets, color: Colors.white, size: 40),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Welcome back,',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.white70,
-                                  ),
-                                ),
-                                Text(
-                                  _userName ?? 'Friend',
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Welcome Section
+                      Container(
+                        padding: const EdgeInsets.all(16.0),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF8C42),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 8,
+                              offset: const Offset(0, 3),
                             ),
-                          ),
-                          const Icon(
-                            Icons.favorite,
-                            color: Colors.white,
-                            size: 30,
-                          ),
-                        ],
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 30,
+                              backgroundColor: Colors.white,
+                              child: const Icon(
+                                Icons.pets,
+                                color: Color(0xFFFF8C42),
+                                size: 32,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Hi, $_userName',
+                                    style: const TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    _getGreeting(),
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white70,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.logout, color: Colors.white),
+                              onPressed: () {
+                                FirebaseAuth.instance.signOut();
+                                Navigator.pushNamedAndRemoveUntil(
+                                  context,
+                                  '/signin',
+                                  (_) => false,
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
+                      const SizedBox(height: 24),
+                      // Weather Component
+                     // Weather Component
+Container(
+  padding: const EdgeInsets.all(16.0),
+  decoration: BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(20),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.grey.withOpacity(0.2),
+        blurRadius: 5,
+        offset: const Offset(0, 2),
+      ),
+    ],
+  ),
+  child: Row(
+    children: [
+      _buildWeatherIcon(_weatherSuggestion['icon'] ?? 'cloud'),
+      const SizedBox(width: 12),
+      Expanded(
+        child: Text(
+          _weatherSuggestion['message'] ?? 'Weather data unavailable',
+          style: const TextStyle(
+            fontSize: 16,
+            color: Color(0xFF333333),
+            fontStyle: FontStyle.italic,
+          ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
+    ],
+  ),
+),
+                      const SizedBox(height: 24),
                     // My Pets Section
                     const Text(
                       'My Pets',
@@ -388,7 +752,7 @@ class _HomeScreenState extends State<HomeScreen>
                                   );
                                 },
                                 child: Container(
-                                  width: 150,
+                                  width: 130,
                                   margin: const EdgeInsets.symmetric(
                                     horizontal: 4.0,
                                     vertical: 8.0,
@@ -396,7 +760,7 @@ class _HomeScreenState extends State<HomeScreen>
                                   decoration: BoxDecoration(
                                     color:
                                         index % 2 == 0
-                                            ? Colors.black
+                                            ? Color(0xFFFF8C42)
                                             : Colors.white,
                                     borderRadius: BorderRadius.circular(20),
                                     boxShadow: [
@@ -494,270 +858,68 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                     const SizedBox(height: 24),
                     // Featured Posts Section
-                    Container(
-                      padding: const EdgeInsets.symmetric(vertical: 12.0),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.2),
-                            spreadRadius: 2,
-                            blurRadius: 5,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
+                    const Text(
+                      'Featured Posts',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF333333),
                       ),
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16.0,
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.pets,
-                                  color: Color(0xFFe74d3d),
-                                  size: 28,
-                                ),
-                                const SizedBox(width: 8),
-                                const Text(
-                                  'Featured Posts',
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF333333),
-                                  ),
-                                ),
-                              ],
-                            ),
+                    ),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      height: 300,
+                      child: StreamBuilder<QuerySnapshot>(
+                        stream:
+                            FirebaseFirestore.instance
+                                .collection('blogs')
+                                .orderBy('createdAt', descending: true)
+                                .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) {
+                            return const Text('Error loading featured posts');
+                          }
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          final featuredPosts = snapshot.data!.docs;
+                          _postCount = featuredPosts.length;
+                          if (featuredPosts.isEmpty) {
+                            return const Text('No featured posts yet');
+                          }
+                          return PageView.builder(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            controller: _pageController,
+                            itemCount: featuredPosts.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              final post = featuredPosts[index];
+                              final data = post.data() as Map<String, dynamic>;
+                              return _buildFeaturedPostCard(context, data);
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                        _postCount,
+                        (index) => Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 3.0),
+                          width: 8.0,
+                          height: 8.0,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color:
+                                _currentPage == index
+                                    ? Color(0xFFFF8C42)
+                                    : Colors.grey.withOpacity(0.5),
                           ),
-                          const SizedBox(height: 12),
-                          SizedBox(
-                            height: 280,
-                            child: StreamBuilder<QuerySnapshot>(
-                              stream:
-                                  FirebaseFirestore.instance
-                                      .collection('blogs')
-                                      .orderBy('createdAt', descending: true)
-                                      .snapshots(),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasError) {
-                                  return const Text(
-                                    'Error loading featured posts',
-                                  );
-                                }
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const Center(
-                                    child: CircularProgressIndicator(),
-                                  );
-                                }
-                                final featuredPosts = snapshot.data!.docs;
-                                _postCount = featuredPosts.length;
-                                if (featuredPosts.isEmpty) {
-                                  return const Text('No featured posts yet');
-                                }
-                                return PageView.builder(
-                                  physics:
-                                      const AlwaysScrollableScrollPhysics(),
-                                  controller: _pageController,
-                                  itemCount: featuredPosts.length,
-                                  itemBuilder: (
-                                    BuildContext context,
-                                    int index,
-                                  ) {
-                                    final post = featuredPosts[index];
-                                    final data =
-                                        post.data() as Map<String, dynamic>;
-                                    return InkWell(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder:
-                                                (context) => BlogPostScreen(
-                                                  blogData: data,
-                                                ),
-                                          ),
-                                        );
-                                      },
-                                      child: Container(
-                                        margin: const EdgeInsets.symmetric(
-                                          horizontal: 16.0,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            colors: [
-                                              Color(
-                                                0xFFecdaca,
-                                              ).withOpacity(0.9),
-                                              Colors.white,
-                                            ],
-                                            begin: Alignment.topLeft,
-                                            end: Alignment.bottomRight,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                          border: Border.all(
-                                            color: Color(
-                                              0xFFe74d3d,
-                                            ).withOpacity(0.3),
-                                            width: 1,
-                                          ),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(12.0),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.book,
-                                                    color: Color(0xFFe74d3d),
-                                                    size: 20,
-                                                  ),
-                                                  const SizedBox(width: 8),
-                                                  Expanded(
-                                                    child: Text(
-                                                      data['title'],
-                                                      style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 20,
-                                                        color: Color(
-                                                          0xFF333333,
-                                                        ),
-                                                      ),
-                                                      maxLines: 1,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 10),
-                                              Expanded(
-                                                child:
-                                                    (data['imageBase64'] !=
-                                                                null &&
-                                                            data['imageBase64']
-                                                                .isNotEmpty)
-                                                        ? ClipRRect(
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                8,
-                                                              ),
-                                                          child: Image.memory(
-                                                            base64Decode(
-                                                              data['imageBase64'],
-                                                            ),
-                                                            fit: BoxFit.cover,
-                                                            width:
-                                                                double.infinity,
-                                                            errorBuilder:
-                                                                (
-                                                                  context,
-                                                                  error,
-                                                                  stackTrace,
-                                                                ) => const Icon(
-                                                                  Icons.error,
-                                                                  size: 50,
-                                                                  color:
-                                                                      Colors
-                                                                          .grey,
-                                                                ),
-                                                          ),
-                                                        )
-                                                        : Container(
-                                                          decoration: BoxDecoration(
-                                                            color:
-                                                                Colors
-                                                                    .grey[200],
-                                                            borderRadius:
-                                                                BorderRadius.circular(
-                                                                  8,
-                                                                ),
-                                                          ),
-                                                          child: const Center(
-                                                            child: Icon(
-                                                              Icons
-                                                                  .image_not_supported,
-                                                              size: 50,
-                                                              color:
-                                                                  Colors.grey,
-                                                            ),
-                                                          ),
-                                                        ),
-                                              ),
-                                              const SizedBox(height: 10),
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    data['authorName'] ??
-                                                        'Unknown',
-                                                    style: const TextStyle(
-                                                      fontSize: 14,
-                                                      color: Color(0xFFe74d3d),
-                                                      fontStyle:
-                                                          FontStyle.italic,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 8),
-                                                  const Icon(
-                                                    Icons.pets,
-                                                    color: Color(0xFFe74d3d),
-                                                    size: 16,
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 5),
-                                              Text(
-                                                data['content'] ??
-                                                    'No content available',
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: List.generate(
-                              _postCount,
-                              (index) => Container(
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 3.0,
-                                ),
-                                width: 8.0,
-                                height: 8.0,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color:
-                                      _currentPage == index
-                                          ? Color(0xFFe74d3d)
-                                          : Colors.grey.withOpacity(0.5),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -862,7 +1024,7 @@ class _HomeScreenState extends State<HomeScreen>
                                         trailing: IconButton(
                                           icon: const Icon(
                                             Icons.delete,
-                                            color: Color(0xFFe74d3d),
+                                            color: Color(0xFFFF8C42),
                                           ),
                                           onPressed:
                                               () =>
@@ -924,7 +1086,7 @@ class _HomeScreenState extends State<HomeScreen>
                             IconButton(
                               icon: const Icon(
                                 Icons.close,
-                                color: Color(0xFFe74d3d),
+                                color: Color(0xFFFF8C42),
                               ),
                               onPressed: _toggleRecordsPanel,
                             ),
@@ -1032,7 +1194,7 @@ class _HomeScreenState extends State<HomeScreen>
                                         trailing: IconButton(
                                           icon: const Icon(
                                             Icons.delete,
-                                            color: Color(0xFFe74d3d),
+                                            color: Color(0xFFFF8C42),
                                           ),
                                           onPressed:
                                               () =>
@@ -1068,7 +1230,7 @@ class _HomeScreenState extends State<HomeScreen>
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: const Color(0xFFe74d3d),
+        selectedItemColor: const Color(0xFFFF8C42),
         unselectedItemColor: Colors.grey,
         onTap: _onItemTapped,
       ),
@@ -1275,13 +1437,13 @@ class _CalendarDialogState extends State<CalendarDialog> {
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFFe74d3d),
+                                color: Color(0xFFFF8C42),
                               ),
                             ),
                             IconButton(
                               icon: const Icon(
                                 Icons.close,
-                                color: Color(0xFFe74d3d),
+                                color: Color(0xFFFF8C42),
                                 size: 20,
                               ),
                               onPressed: () => Navigator.of(context).pop(),
@@ -1302,6 +1464,7 @@ class _CalendarDialogState extends State<CalendarDialog> {
                                 _showChatbox = false;
                               });
                             },
+
                             calendarStyle: CalendarStyle(
                               cellMargin: const EdgeInsets.all(2.0),
                               todayDecoration: const BoxDecoration(
@@ -1309,7 +1472,7 @@ class _CalendarDialogState extends State<CalendarDialog> {
                                 shape: BoxShape.circle,
                               ),
                               selectedDecoration: const BoxDecoration(
-                                color: Color(0xFFe74d3d),
+                                color: Color(0xFFFF8C42),
                                 shape: BoxShape.circle,
                               ),
                               markerDecoration: const BoxDecoration(
@@ -1322,7 +1485,7 @@ class _CalendarDialogState extends State<CalendarDialog> {
                                 fontSize: 14,
                               ),
                               weekendTextStyle: TextStyle(
-                                color: const Color(0xFFe74d3d).withOpacity(0.8),
+                                color: const Color(0xFFFF8C42).withOpacity(0.8),
                                 fontWeight: FontWeight.w500,
                                 fontSize: 14,
                               ),
@@ -1340,12 +1503,12 @@ class _CalendarDialogState extends State<CalendarDialog> {
                               ),
                               leftChevronIcon: Icon(
                                 Icons.chevron_left,
-                                color: Color(0xFFe74d3d),
+                                color: Color(0xFFFF8C42),
                                 size: 20,
                               ),
                               rightChevronIcon: Icon(
                                 Icons.chevron_right,
-                                color: Color(0xFFe74d3d),
+                                color: Color(0xFFFF8C42),
                                 size: 20,
                               ),
                             ),
@@ -1423,7 +1586,7 @@ class _CalendarDialogState extends State<CalendarDialog> {
                                       margin: const EdgeInsets.all(2.0),
                                       decoration: BoxDecoration(
                                         color: const Color(
-                                          0xFFe74d3d,
+                                          0xFFFF8C42,
                                         ).withOpacity(0.8),
                                         shape: BoxShape.circle,
                                       ),
@@ -1476,7 +1639,7 @@ class _CalendarDialogState extends State<CalendarDialog> {
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(10),
                                     border: Border.all(
-                                      color: const Color(0xFFe74d3d),
+                                      color: const Color(0xFFFF8C42),
                                       width: 1.5,
                                     ),
                                     boxShadow: [
@@ -1541,7 +1704,7 @@ class _CalendarDialogState extends State<CalendarDialog> {
                                                                 const TextStyle(
                                                                   fontSize: 12,
                                                                   color: Color(
-                                                                    0xFFe74d3d,
+                                                                    0xFFFF8C42,
                                                                   ),
                                                                 ),
                                                           ),
@@ -1594,7 +1757,7 @@ class _CloudTailPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint =
         Paint()
-          ..color = const Color(0xFFe74d3d)
+          ..color = const Color(0xFFFF8C42)
           ..style = PaintingStyle.fill;
 
     final path = Path();
