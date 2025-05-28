@@ -71,14 +71,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   enabled: !_isLoading,
                   decoration: InputDecoration(
                     labelText: 'Full Name',
-                    hintText: 'John Doe',
                     prefixIcon: const Icon(Icons.person_outline),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                          color: const Color(0xFFe74d3d), width: 2),
+                          color: const Color(0xFFFF8C42), width: 2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
@@ -92,14 +91,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   enabled: !_isLoading,
                   decoration: InputDecoration(
                     labelText: 'Phone Number (Optional)',
-                    hintText: '+1 234 567 890',
                     prefixIcon: const Icon(Icons.phone_outlined),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                          color: const Color(0xFFe74d3d), width: 2),
+                          color: const Color(0xFFFF8C42), width: 2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
