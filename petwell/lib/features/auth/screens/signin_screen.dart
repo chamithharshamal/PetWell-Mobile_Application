@@ -19,7 +19,7 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFecdaca), // PetWell theme background
+      backgroundColor: const Color(0xFFFFFFFF), // PetWell theme background
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
