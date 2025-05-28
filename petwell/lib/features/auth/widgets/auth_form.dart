@@ -1,12 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart'; 
-import 'package:sign_in_with_apple/sign_in_with_apple.dart'; 
-
 import '../../home/home_screen.dart';
 
 class AuthForm extends StatefulWidget {
@@ -51,7 +47,7 @@ class _AuthFormState extends State<AuthForm> {
     try {
       final LoginResult result = await FacebookAuth.instance.login(
         permissions: ['public_profile', 'email'],
-      ); // Request email as well <sup data-citation="1" className="inline select-none [&>a]:rounded-2xl [&>a]:border [&>a]:px-1.5 [&>a]:py-0.5 [&>a]:transition-colors shadow [&>a]:bg-ds-bg-subtle [&>a]:text-xs [&>svg]:w-4 [&>svg]:h-4 relative -top-[2px] citation-shimmer"><a href="#" title="Reference 1 (source not available)">1</a></sup>
+      ); 
       if (result.status == LoginStatus.success) {
         final OAuthCredential credential = FacebookAuthProvider.credential(
           result.accessToken!.token,
@@ -121,10 +117,7 @@ class _AuthFormState extends State<AuthForm> {
                 borderRadius: BorderRadius.circular(12),
               ),
               focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Color(0xFFe74d3d), // Same red color
-                  width: 2,
-                ),
+                borderSide: BorderSide(color: Color(0xFFFF8C42), width: 2),
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
@@ -154,7 +147,7 @@ class _AuthFormState extends State<AuthForm> {
                 borderRadius: BorderRadius.circular(12),
               ),
               focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Color(0xFFe74d3d), width: 2),
+                borderSide: BorderSide(color: Color(0xFFFF8C42), width: 2),
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
@@ -185,7 +178,7 @@ class _AuthFormState extends State<AuthForm> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFFe74d3d), width: 2),
+                  borderSide: BorderSide(color: Color(0xFFFF8C42), width: 2),
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
