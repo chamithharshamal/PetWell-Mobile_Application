@@ -28,7 +28,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _isLoading = true;
 
   // App color scheme
-  final Color primaryColor = const Color(0xFFe74d3d);
+  final Color primaryColor = const Color(0xFFFF8C42);
   final Color secondaryColor = const Color(0xFFf1948a);
   final Color backgroundColor = Colors.white;
 
